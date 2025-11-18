@@ -1,0 +1,7 @@
+name = "menu-semanal"
+compatibility_date = "2024-11-18"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "menu-semanal-db"
+database_id = "e1d9898e-5016-49e4-9d2c-871c6f4c6f6f"
