@@ -1,8 +1,6 @@
 <script lang="ts">
 	interface Props {
-		showJsonInput: boolean;
 		listCleared: boolean;
-		onToggleJsonInput: () => void;
 		onMarkAll: () => void;
 		onUnmarkAll: () => void;
 		onPrintList: () => void;
@@ -10,9 +8,7 @@
 	}
 
 	let {
-		showJsonInput,
 		listCleared,
-		onToggleJsonInput,
 		onMarkAll,
 		onUnmarkAll,
 		onPrintList,
@@ -23,12 +19,6 @@
 <!-- Action Buttons - Top of the page -->
 <div class="bg-white py-4 border-b mb-6">
 	<div class="flex justify-center space-x-4 flex-wrap gap-2">
-		<button 
-			onclick={onToggleJsonInput}
-			class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-		>
-			{showJsonInput ? 'Cancelar Importación' : '📋 Importar JSON'}
-		</button>
 		{#if !listCleared}
 			<button 
 				onclick={onMarkAll}

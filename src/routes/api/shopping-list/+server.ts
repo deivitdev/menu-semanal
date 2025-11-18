@@ -45,9 +45,50 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 	}
 
 	try {
-		const body = await request.json() as { ingredients: any[] };
-		const { ingredients } = body;
+		const body = await request.json();
+		
+		// Caso 1: Agregar un solo ingrediente
+		if (body && typeof body === 'object' && 'ingredient' in body && !('ingredients' in body)) {
+			const { ingredient } = body as { ingredient: any };
+			
+			// Generar ID único
+			const id = Date.now().toString();
+			
+			// Insertar el ingrediente
+			await env.DB.prepare(`
+				INSERT INTO ingredients (id, shopping_list_id, name, quantity, unit, observations, is_checked, category)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+			`).bind(
+				id,
+				'default',
+				ingredient.name,
+				ingredient.quantity || '',
+				ingredient.unit || '',
+				ingredient.observations || '',
+				ingredient.isChecked || false,
+				'Otros' // Categoría por defecto
+			).run();
+			
+			// Obtener la lista actualizada
+			const listResult = await env.DB.prepare(
+				'SELECT * FROM shopping_lists WHERE id = ?'
+			).bind('default').first();
+			
+			const ingredientsResult = await env.DB.prepare(
+				'SELECT * FROM ingredients WHERE shopping_list_id = ? ORDER BY category, name'
+			).bind('default').all();
 
+			return new Response(JSON.stringify({
+				shoppingList: listResult,
+				ingredients: ingredientsResult.results || []
+			}), {
+				headers: { 'Content-Type': 'application/json' }
+			});
+		}
+		
+		// Caso 2: Reemplazar todos los ingredientes (funcionalidad existente)
+		const { ingredients } = body as { ingredients: any[] };
+		
 		if (!Array.isArray(ingredients)) {
 			return new Response('Invalid ingredients data', { status: 400 });
 		}

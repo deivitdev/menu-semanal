@@ -4,6 +4,7 @@
 		jsonInput: string;
 		onLoadFromJson: () => void;
 		onClearInput: () => void;
+		onCancel: () => void;
 		onJsonInputChange?: (value: string) => void;
 	}
 
@@ -12,6 +13,7 @@
 		jsonInput,
 		onLoadFromJson,
 		onClearInput,
+		onCancel,
 		onJsonInputChange
 	}: Props = $props();
 
@@ -46,6 +48,12 @@
 					class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
 				>
 					Limpiar
+				</button>
+				<button 
+					onclick={onCancel}
+					class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+				>
+					Cancelar
 				</button>
 			</div>
 			<p class="text-xs text-gray-600">

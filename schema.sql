@@ -1,4 +1,19 @@
 -- Schema para Menu Semanal Database
+DROP TABLE IF EXISTS weekly_menu;
+
+CREATE TABLE weekly_menu (
+    id TEXT PRIMARY KEY,
+    day TEXT NOT NULL UNIQUE,
+    breakfast TEXT,
+    breakfast_desc TEXT,
+    lunch TEXT,
+    lunch_desc TEXT,
+    dinner TEXT,
+    dinner_desc TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 DROP TABLE IF EXISTS shopping_lists;
 
 CREATE TABLE shopping_lists (
