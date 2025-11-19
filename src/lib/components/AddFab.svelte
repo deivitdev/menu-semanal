@@ -62,7 +62,7 @@
 		<!-- FAB Main Button -->
 		<button
 			on:click={toggleOptions}
-			class="bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 flex items-center justify-center"
+			class="fab-button w-14 h-14 rounded-full shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-4 flex items-center justify-center"
 			aria-label="Agregar ingredientes"
 		>
 			<svg class="w-6 h-6 {showOptions ? 'rotate-45' : ''} transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

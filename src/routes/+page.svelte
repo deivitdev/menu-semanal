@@ -94,7 +94,7 @@
 	<div class="container mx-auto px-4">
 		{#if loading}
 			<div class="flex justify-center items-center min-h-[400px]">
-				<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+				<div class="animate-spin rounded-full h-12 w-12 border-b-2 loader-ring"></div>
 			</div>
 		{:else if error}
 			<div class="flex justify-center items-center min-h-[400px]">

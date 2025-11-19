@@ -206,7 +206,6 @@ export function useJsonImport() {
                                 quantity: item.quantity || '',
                                 unit: item.unit || '',
                                 observations: item.observations || '',
-                                isChecked: false,
                                 category: item.category
                         }));
 

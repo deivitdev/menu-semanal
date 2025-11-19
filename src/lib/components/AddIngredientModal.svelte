@@ -21,8 +21,7 @@
 			name: ingredient.name.trim(),
 			quantity: ingredient.quantity.trim(),
 			unit: ingredient.unit.trim(),
-			observations: ingredient.observations.trim(),
-			isChecked: false
+			observations: ingredient.observations.trim()
 		};
 		
 		dispatch('add', { ingredient: newIngredient });

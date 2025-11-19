@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Navbar from '$lib/components/Navbar.svelte';
+	import { theme } from '$lib/stores/theme';
+	import { PawPrint } from 'lucide-svelte';
 </script>
 
 <Navbar />
@@ -7,12 +9,25 @@
 	<div class="container mx-auto px-4 py-8">
 		<div class="max-w-4xl mx-auto space-y-8">
 			<section class="bg-white rounded-lg shadow p-6">
-				<h1 class="text-2xl font-bold mb-4">FAQ • Modelos de Datos</h1>
-				<p class="text-gray-600">Guía rápida de las estructuras usadas para el menú semanal y los ingredientes.</p>
+				<h1 class="text-2xl font-bold mb-4">
+					FAQ • Modelos de Datos
+					{#if $theme === 'cats'} <span class="ml-2">🐱📚</span>{/if}
+				</h1>
+				<p class="text-gray-600">
+					Guía rápida de las estructuras usadas para el menú semanal y los ingredientes
+					{#if $theme === 'cats'} (aprobadas por gatitos exigentes 🐾){/if}.
+				</p>
 			</section>
 
 			<section class="bg-white rounded-lg shadow p-6">
-				<h2 class="text-xl font-semibold mb-3">Modelo de Ingrediente</h2>
+				<h2 class="text-xl font-semibold mb-3 flex items-center gap-2">
+					<span>Modelo de Ingrediente</span>
+					{#if $theme === 'cats'}
+						<span class="inline-flex items-center text-pink-500">
+							<PawPrint size={18} />
+						</span>
+					{/if}
+				</h2>
 				<p class="text-gray-600 mb-4">Estructura base que representa un ingrediente individual de la lista de compras:</p>
 				<pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-auto text-sm"><code>{`export interface Ingredient {
   id: number;
@@ -20,7 +35,6 @@
   quantity: string;
   unit: string;
   observations?: string;
-  isChecked?: boolean;
   category?: string;
 }`}</code></pre>
 

@@ -155,7 +155,7 @@
 					<button
 						class={`p-4 rounded-lg border-2 transition-all ${
 							selectedOption === 'menu'
-								? 'border-blue-500 bg-blue-50 text-blue-700'
+								? 'border-[color:var(--color-primary)] bg-[color:var(--color-primary-soft)] text-[color:var(--color-primary)]'
 								: 'border-gray-200 hover:border-gray-300'
 						}`}
 						onclick={() => handleOptionChange('menu')}
@@ -173,7 +173,7 @@
 					<button
 						class={`p-4 rounded-lg border-2 transition-all ${
 							selectedOption === 'ingredients'
-								? 'border-blue-500 bg-blue-50 text-blue-700'
+								? 'border-[color:var(--color-primary)] bg-[color:var(--color-primary-soft)] text-[color:var(--color-primary)]'
 								: 'border-gray-200 hover:border-gray-300'
 						}`}
 						onclick={() => handleOptionChange('ingredients')}

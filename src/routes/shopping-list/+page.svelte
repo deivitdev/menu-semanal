@@ -4,8 +4,10 @@
 	import ShoppingListContent from '$lib/components/ShoppingListContent.svelte';
 	import EmptyShoppingList from '$lib/components/EmptyShoppingList.svelte';
 	import AddFab from '$lib/components/AddFab.svelte';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { useShoppingList } from '$lib/composables/useShoppingList';
+	import { theme } from '$lib/stores/theme';
+	import { PawPrint } from 'lucide-svelte';
 	import type { CategorizedIngredients, Ingredient } from '$lib/types/ingredients';
 
 	// Initialize composables
@@ -28,14 +30,36 @@
 
 	let loading = $state(false);
 	let error = $state<string | null>(null);
-	let ingredients = $state<CategorizedIngredients | null>(null);
+	let ingredients = $state<CategorizedIngredients>({
+		"Frutas y Verduras": [],
+		"Proteínas": [],
+		"Lácteos y Huevos": [],
+		"Pan y Cereales": [],
+		"Despensa": [],
+		"Otros": []
+	});
 	let listCleared = $state(false);
+	let syncTimeout: ReturnType<typeof setTimeout> | null = null;
+
+	// Cleanup timeout on component destroy
+	onDestroy(() => {
+		if (syncTimeout) {
+			clearTimeout(syncTimeout);
+		}
+	});
 
 	// Suscribirse a los cambios
 	onMount(() => {
 		const unsubscribeLoading = shoppingList.loading.subscribe(value => loading = value);
 		const unsubscribeError = shoppingList.error.subscribe(value => error = value);
-		const unsubscribeIngredients = shoppingList.ingredients.subscribe(value => ingredients = value);
+		const unsubscribeIngredients = shoppingList.ingredients.subscribe(value => ingredients = value || {
+			"Frutas y Verduras": [],
+			"Proteínas": [],
+			"Lácteos y Huevos": [],
+			"Pan y Cereales": [],
+			"Despensa": [],
+			"Otros": []
+		});
 		const unsubscribeListCleared = shoppingList.listCleared.subscribe(value => listCleared = value);
 		
 		return () => {
@@ -51,12 +75,25 @@
 <main class="min-h-screen bg-gray-50 pt-16">
 	<div class="max-w-4xl mx-auto py-8 px-4">
 		<div class="bg-white rounded-lg shadow-md p-6">
-			<h1 class="text-3xl font-bold text-gray-900 mb-8 text-center">🛒 Lista de Compras</h1>
+			<h1 class="text-3xl font-bold text-gray-900 mb-2 text-center flex items-center justify-center gap-2">
+				<span>🛒 Lista de Compras</span>
+				{#if $theme === 'cats'}
+					<span class="inline-flex items-center gap-1 text-pink-500 text-lg">
+						<PawPrint size={18} />
+						<span class="text-sm">(aprobada por gatitos)</span>
+					</span>
+				{/if}
+			</h1>
+			{#if $theme === 'cats'}
+				<p class="text-center text-sm text-gray-600 mb-6">No olvides las latitas favoritas y las croquetas premium 🐾</p>
+			{:else}
+				<p class="text-center text-sm text-gray-600 mb-6">Organiza todo lo que necesitas para tu menú semanal.</p>
+			{/if}
 			
 			<!-- Loading indicator -->
 			{#if loading}
 				<div class="flex justify-center items-center py-8">
-					<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+					<div class="animate-spin rounded-full h-8 w-8 border-b-2 loader-ring"></div>
 					<span class="ml-2 text-gray-600">Cargando lista de compras...</span>
 				</div>
 			{/if}
@@ -86,8 +123,6 @@
 			<!-- Action Buttons - Top of the page -->
 			<ShoppingListActions
 				listCleared={listCleared}
-				onMarkAll={() => shoppingList.markAll()}
-				onUnmarkAll={() => shoppingList.unmarkAll()}
 				onPrintList={() => shoppingList.printList()}
 				onClearList={() => handleClearList()}
 			/>
@@ -95,19 +130,30 @@
 			<!-- Shopping List Content -->
 			{#if !loading && !error}
 				{#if !listCleared}
-					{#if ingredients}
-						<div>
-							<h2 class="text-xl font-semibold mb-4 text-gray-800">Ingredientes Necesarios</h2>
-							<ShoppingListContent ingredients={ingredients} />
-						</div>
-					{:else}
-						<div class="text-center py-8 text-gray-500">
-							<p>No hay ingredientes en la lista</p>
-						</div>
-					{/if}
+					<div>
+						<h2 class="text-xl font-semibold mb-4 text-gray-800">Ingredientes Necesarios</h2>
+						<ShoppingListContent 
+							ingredients={ingredients}
+						/>
+					</div>
 				{:else}
 					<EmptyShoppingList onRestoreList={() => restoreList()} />
 				{/if}
+			{:else if loading}
+				<div class="text-center py-8">
+					<div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+					<p class="mt-2 text-gray-500">Cargando lista de compras...</p>
+				</div>
+			{:else if error}
+				<div class="text-center py-8 text-red-500">
+					<p>{error}</p>
+					<button 
+						class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+						onclick={() => shoppingList.loadFromAPI()}
+					>
+						Reintentar
+					</button>
+				</div>
 			{/if}
 		</div>
 	</div>

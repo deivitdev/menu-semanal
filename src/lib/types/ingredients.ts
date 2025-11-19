@@ -4,7 +4,6 @@ export interface Ingredient {
 	quantity: string;
 	unit: string;
 	observations?: string;
-	isChecked?: boolean;
 	category?: string;
 }
 

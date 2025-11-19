@@ -17,17 +17,84 @@ interface ApiResponse {
 	ingredients: ApiIngredient[];
 }
 
+// Store global de sincronización compartido entre todos los componentes
+export const syncingStore = writable(false);
+
 export function useShoppingList() {
 	const ingredientsStore = writable<CategorizedIngredients | null>(null);
 	const listClearedStore = writable(false);
 	const loadingStore = writable(true);
 	const errorStore = writable<string | null>(null);
 
+	// Cache en memoria para evitar llamadas innecesarias a la API
+	let cachedData: { data: any; timestamp: number } | null = null;
+	const CACHE_DURATION = 30000; // 30 segundos de caché
+
+	// Cache persistente en localStorage para carga instantánea
+	const STORAGE_KEY = 'shopping-list-cache';
+	const STORAGE_DURATION = 5 * 60 * 1000; // 5 minutos de cache persistente
+
+	// Funciones para manejar cache persistente
+	function getStorageCache(): { data: any; timestamp: number } | null {
+		try {
+			const cached = localStorage.getItem(STORAGE_KEY);
+			if (!cached) return null;
+			
+			const parsed = JSON.parse(cached);
+			const now = Date.now();
+			
+			// Verificar si el cache aún es válido
+			if (now - parsed.timestamp > STORAGE_DURATION) {
+				localStorage.removeItem(STORAGE_KEY);
+				return null;
+			}
+			
+			return parsed;
+		} catch (error) {
+			console.warn('Error reading from localStorage:', error);
+			return null;
+		}
+	}
+
+	function setStorageCache(data: any): void {
+		try {
+			localStorage.setItem(STORAGE_KEY, JSON.stringify({
+				data,
+				timestamp: Date.now()
+			}));
+		} catch (error) {
+			console.warn('Error writing to localStorage:', error);
+		}
+	}
+
 	// Cargar desde la API
 	async function loadFromAPI() {
 		console.log('loadFromAPI: Iniciando carga desde API...');
 		loadingStore.set(true);
 		errorStore.set(null);
+		
+		// Verificar si hay cache persistente válido
+        const storageCache = getStorageCache();
+        if (storageCache) {
+            console.log('loadFromAPI: Cargando desde cache persistente...');
+            const data = storageCache.data;
+            const apiIngredients = data.ingredients || [];
+            
+            // Transformar los datos del cache al formato correcto (igual que cuando se carga desde API)
+            const ingredients: Ingredient[] = apiIngredients.map((item: any) => ({
+                id: parseInt(item.id.toString()),
+                name: item.name,
+                quantity: item.quantity,
+                unit: item.unit,
+                observations: item.observations || ''
+            }));
+            
+            const categorized = categorizeIngredients(ingredients);
+            ingredientsStore.set(categorized);
+            listClearedStore.set(ingredients.length === 0);
+            loadingStore.set(false);
+            return;
+        }
 		
 		try {
 			console.log('loadFromAPI: Haciendo fetch a /api/shopping-list');
@@ -41,13 +108,12 @@ export function useShoppingList() {
 			console.log('loadFromAPI: Ingredientes recibidos:', apiIngredients.length);
 			
 			// Transformar los datos de la API al formato correcto
-			const ingredients: Ingredient[] = apiIngredients.map(item => ({
+			const ingredients: Ingredient[] = apiIngredients.map((item: any) => ({
 				id: parseInt(item.id.toString()),
 				name: item.name,
 				quantity: item.quantity,
 				unit: item.unit,
-				observations: item.observations || '',
-				isChecked: Boolean(item.is_checked)
+				observations: item.observations || ''
 			}));
 			
 			// Convertir a formato categorizado usando la función de categorización
@@ -56,6 +122,9 @@ export function useShoppingList() {
 			console.log('loadFromAPI: Ingredientes categorizados:', categorized);
 			console.log('loadFromAPI: Cantidad de ingredientes por categoría:', 
 				Object.entries(categorized).map(([cat, items]) => `${cat}: ${items.length}`));
+			
+			// Guardar en localStorage para persistencia
+			setStorageCache(data);
 			
 			ingredientsStore.set(categorized);
 			listClearedStore.set(ingredients.length === 0);
@@ -99,14 +168,6 @@ export function useShoppingList() {
 		} finally {
 			loadingStore.set(false);
 		}
-	}
-
-	function markAll() {
-		document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach(cb => cb.checked = true);
-	}
-
-	function unmarkAll() {
-		document.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach(cb => cb.checked = false);
 	}
 
 	function printList() {
@@ -163,8 +224,6 @@ export function useShoppingList() {
 		listCleared: listClearedStore,
 		loading: loadingStore,
 		error: errorStore,
-		markAll,
-		unmarkAll,
 		printList,
 		clearShoppingList,
 		updateIngredients,

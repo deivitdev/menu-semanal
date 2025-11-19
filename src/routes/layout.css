@@ -1,2 +1,101 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
+
+/* Theming */
+:root {
+	--color-page-bg: #f9fafb;
+	--color-card-bg: #ffffff;
+	--color-nav-bg: #ffffff;
+	--color-nav-shadow: rgba(0, 0, 0, 0.1);
+	--color-primary: #2563eb;
+	--color-primary-hover: #1d4ed8;
+	--color-primary-soft: #dbeafe;
+	--color-text-main: #111827;
+	--color-text-muted: #6b7280;
+}
+
+:root[data-theme='healthy'] {
+	--color-page-bg: #f0fdf4;
+	--color-card-bg: #ffffff;
+	--color-nav-bg: #ecfdf5;
+	--color-nav-shadow: rgba(22, 163, 74, 0.15);
+	--color-primary: #16a34a;
+	--color-primary-hover: #15803d;
+	--color-primary-soft: #dcfce7;
+	--color-text-main: #052e16;
+	--color-text-muted: #166534;
+}
+
+/* Tema Gatitos: colores pastel, rosa y lila, muy cute */
+:root[data-theme='cats'] {
+	/* Paleta inspirada en Catppuccin (rosados/violetas suaves) */
+	--color-page-bg: #f4dbd6; /* rosewater */
+	--color-card-bg: #f5e0dc; /* flamingo */
+	--color-nav-bg: #f2cdcd; /* pink */
+	--color-nav-shadow: rgba(198, 160, 246, 0.25); /* mauve sombra suave */
+	--color-primary: #f5c2e7; /* pink acento */
+	--color-primary-hover: #f38ba8; /* red-pink más intenso */
+	--color-primary-soft: #f5e0dc; /* fondo suave para pills/botones */
+	--color-text-main: #4c4f69; /* texto principal Catppuccin latte */
+	--color-text-muted: #9ca0b0; /* texto secundario suave */
+}
+
+/* Pequeño patrón de huellitas en el tema de gatitos */
+:root[data-theme='cats'] body::before {
+	content: '🐾';
+	position: fixed;
+	font-size: 4rem;
+	opacity: 0.12;
+	bottom: 1rem;
+	right: 1.5rem;
+	pointer-events: none;
+	z-index: 0;
+}
+
+body {
+	background-color: var(--color-page-bg);
+	color: var(--color-text-main);
+}
+
+/* Themed navbar helpers */
+.navbar {
+	background-color: var(--color-nav-bg);
+	box-shadow: 0 1px 3px 0 var(--color-nav-shadow);
+}
+
+/* Themed chips and buttons */
+.today-chip {
+	background-color: var(--color-primary);
+	color: #ffffff;
+}
+
+.btn-primary-theme {
+	background-color: var(--color-primary);
+	color: #ffffff;
+}
+
+.btn-primary-theme:hover {
+	background-color: var(--color-primary-hover);
+}
+
+.btn-secondary-theme {
+	border-color: var(--color-primary-soft);
+	color: var(--color-text-main);
+}
+
+.fab-button {
+	background-color: var(--color-primary);
+	color: #ffffff;
+}
+
+.fab-button:hover {
+	background-color: var(--color-primary-hover);
+}
+
+.card-theme {
+	background-color: var(--color-card-bg);
+}
+
+.loader-ring {
+	border-color: var(--color-primary);
+}

@@ -2,6 +2,7 @@
 	import MealCard from './MealCard.svelte';
 	import { DefaultDateService } from '$lib/services/DateService';
 	import { defaultTheme } from '$lib/constants/MenuThemes';
+	import { theme } from '$lib/stores/theme';
 	import type { DayMenu, Meal } from '$lib/types/MenuTypes';
 
 	interface Props {
@@ -36,7 +37,9 @@
 	<h3 class={dayTitleClasses}>
 		{day}
 		{#if isToday}
-			<span class="text-sm bg-blue-600 text-white px-2 py-1 rounded-full ml-2">Hoy</span>
+			<span class="today-chip text-sm px-2 py-1 rounded-full ml-2">
+				Hoy{#if $theme === 'cats'} 😺{/if}
+			</span>
 		{/if}
 	</h3>
 	<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
