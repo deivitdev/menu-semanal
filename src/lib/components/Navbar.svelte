@@ -48,7 +48,7 @@
 		<div class="nav-menu desktop-menu">
 			<a href="/" class="nav-link">Inicio</a>
 			<a href="/shopping-list" class="nav-link">Lista de Compras</a>
-			<a href="/login" class="nav-link">Login</a>
+			<a href="/faq" class="nav-link">FAQ</a>
 		</div>
 
 		<!-- Mobile menu -->
@@ -57,7 +57,7 @@
 				<div class="mobile-menu" onclick={(e) => e.stopPropagation()}>
 					<a href="/" class="nav-link" onclick={closeMenu}>Inicio</a>
 					<a href="/shopping-list" class="nav-link" onclick={closeMenu}>Lista de Compras</a>
-					<a href="/login" class="nav-link" onclick={closeMenu}>Login</a>
+					<a href="/faq" class="nav-link" onclick={closeMenu}>FAQ</a>
 				</div>
 			</div>
 		{/if}

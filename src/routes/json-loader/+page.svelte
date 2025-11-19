@@ -7,6 +7,7 @@
 
 	let selectedOption = 'menu';
 	let jsonContent = '';
+	let isLoading = false;
 
 	const jsonTemplates = {
 		menu: `[
@@ -102,12 +103,22 @@
 	}
 
 	async function handleLoadJson() {
+		if (isLoading) return;
+		isLoading = true;
 		jsonInput.set(jsonContent);
-		const result = await loadFromJson();
-		console.log('JSON load result:', result);
-
-		// Navigate back to previous page or home
-		goto('/');
+		try {
+			const result = await loadFromJson();
+			console.log('JSON load result:', result);
+			alert('JSON cargado correctamente');
+			if (selectedOption === 'menu') {
+				goto('/');
+			}
+		} catch (e) {
+			console.error('Error cargando JSON', e);
+			alert('Hubo un error al cargar el JSON. Verifica el formato e inténtalo nuevamente.');
+		} finally {
+			isLoading = false;
+		}
 	}
 
 	function handleBack() {
@@ -148,6 +159,7 @@
 								: 'border-gray-200 hover:border-gray-300'
 						}`}
 						onclick={() => handleOptionChange('menu')}
+						disabled={isLoading}
 					>
 						<div class="flex flex-col items-center gap-2">
 							<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,6 +177,7 @@
 								: 'border-gray-200 hover:border-gray-300'
 						}`}
 						onclick={() => handleOptionChange('ingredients')}
+						disabled={isLoading}
 					>
 						<div class="flex flex-col items-center gap-2">
 							<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -182,20 +195,31 @@
 				<h2 class="text-xl font-semibold mb-4">Contenido JSON</h2>
 				<textarea
 					bind:value={jsonContent}
-					class="w-full h-96 p-4 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+					class="w-full h-96 p-4 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60 disabled:cursor-not-allowed"
 					placeholder="Pega aquí tu contenido JSON..."
+					disabled={isLoading}
 				></textarea>
 
 				<div class="flex gap-4 mt-6">
 					<button
 						onclick={handleLoadJson}
-						class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+						class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+						disabled={isLoading}
 					>
-						Cargar JSON
+						{#if isLoading}
+							<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+							</svg>
+							Cargando...
+						{:else}
+							Cargar JSON
+						{/if}
 					</button>
 					<button
 						onclick={() => (jsonContent = jsonTemplates[selectedOption as keyof typeof jsonTemplates] || '')}
-						class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+						class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+						disabled={isLoading}
 					>
 						Restablecer
 					</button>

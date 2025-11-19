@@ -36,7 +36,7 @@
 	<h3 class={dayTitleClasses}>
 		{day}
 		{#if isToday}
-			<span class="text-sm bg-blue-600 text-white px-2 py-1 rounded-full">Hoy</span>
+			<span class="text-sm bg-blue-600 text-white px-2 py-1 rounded-full ml-2">Hoy</span>
 		{/if}
 	</h3>
 	<div class="grid grid-cols-1 md:grid-cols-3 gap-4">

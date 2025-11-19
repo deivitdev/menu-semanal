@@ -2,7 +2,7 @@
 	import Navbar from '$lib/components/Navbar.svelte';
 	import DayMenu from '$lib/components/DayMenu.svelte';
 	import AddFab from '$lib/components/AddFab.svelte';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 
 	interface DayMenuItem {
 		day: string;
@@ -15,9 +15,10 @@
 	}
 
 	// Reactive state for menu data
-	let weeklyMenu: DayMenuItem[] = $state([]);
-	let loading = $state(true);
-	let error: string | null = $state(null);
+	let weeklyMenu: DayMenuItem[] = [];
+	let loading = true;
+	let error: string | null = null;
+	let hasScrolledToToday = false;
 
 	// Load menu data from API
 	async function loadWeeklyMenu() {
@@ -48,6 +49,7 @@
 		const handleVisibilityChange = () => {
 			if (document.visibilityState === 'visible') {
 				loadWeeklyMenu();
+				hasScrolledToToday = false;
 			}
 		};
 
@@ -58,15 +60,28 @@
 		};
 	});
 
-	// Scroll to current day
-	onMount(() => {
+	async function scrollToToday() {
+		if (hasScrolledToToday || loading || weeklyMenu.length === 0) return;
+		// Esperar a que el DOM termine de renderizar las cards
+		await tick();
 		const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 		const currentDay = days[new Date().getDay()];
 		const element = document.getElementById(currentDay);
 		if (element) {
-			element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			const navbarOffset = 72; // altura aprox. de la navbar (4rem)
+			const rect = element.getBoundingClientRect();
+			const targetY = rect.top + window.scrollY - navbarOffset;
+			window.scrollTo({ top: targetY, behavior: 'smooth' });
+			hasScrolledToToday = true;
 		}
-	});
+	}
+
+	// After data load, ensure today's day is brought into view once
+	$: {
+		if (!loading && weeklyMenu.length > 0) {
+			scrollToToday();
+		}
+	}
 
 	function handleAddIngredient(event: CustomEvent<{ ingredient: string }>) {
 		// Navigate to shopping list page
